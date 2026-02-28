@@ -20,39 +20,39 @@ if (!selector || text === undefined) {
 	console.log("  <text>     Text to type");
 	console.log("\nOptions:");
 	console.log("  --clear    Clear input before typing");
-	console.log("  --append   Append text (don't clear first)");
-	console.log("  --typing   Simulate real typing (character by character)");
+	console.log("  --append   Append text");
+	console.log("  --typing   Simulate real typing");
 	console.log("\nExamples:");
 	console.log("  browser-type.js '#search-input' 'hello world'");
 	console.log("  browser-type.js '#search-input' 'hello' --clear");
-	console.log("  browser-type.js '#search-input' 'extra text' --append");
-	console.log("  browser-type.js '#search-input' 'slow typing' --typing");
 	process.exit(1);
 }
 
-const b = await puppeteer.connect({
-	browserURL: "http://localhost:9222",
-	defaultViewport: null,
-});
-
-const pages = await b.pages();
-const p = pages.at(-1);
-
-if (!p) {
-	console.error("✗ No active tab found");
-	await b.disconnect();
-	process.exit(1);
-}
-
-const element = await p.$(selector);
-
-if (!element) {
-	console.error(`✗ Element not found: ${selector}`);
-	await b.disconnect();
-	process.exit(1);
-}
-
+let browser;
 try {
+	browser = await puppeteer.connect({
+		browserURL: "http://localhost:9222",
+		defaultViewport: null,
+		timeout: 5000,
+	});
+
+	const pages = await browser.pages();
+	const p = pages.at(-1);
+
+	if (!p) {
+		console.error("✗ No active tab found");
+		await browser.disconnect();
+		process.exit(1);
+	}
+
+	const element = await p.$(selector);
+
+	if (!element) {
+		console.error(`✗ Element not found: ${selector}`);
+		await browser.disconnect();
+		process.exit(1);
+	}
+
 	await element.scrollIntoViewIfNeeded();
 	await element.focus();
 
@@ -72,6 +72,8 @@ try {
 	console.log(`✓ Typed: "${text}" into ${selector}`);
 } catch (err) {
 	console.error(`✗ Failed to type: ${err.message}`);
-	await b.disconnect();
+	if (browser) await browser.disconnect();
 	process.exit(1);
 }
+
+if (browser) await browser.disconnect();

@@ -22,45 +22,53 @@ if (!action) {
 	process.exit(1);
 }
 
-const b = await puppeteer.connect({
-	browserURL: "http://localhost:9222",
-	defaultViewport: null,
-});
+let browser;
+let disconnected = false;
+
+async function safeDisconnect() {
+	if (browser && !disconnected) {
+		disconnected = true;
+		await browser.disconnect();
+	}
+}
+
+process.on("SIGINT", safeDisconnect);
+process.on("SIGTERM", safeDisconnect);
 
 try {
-	const pages = await b.pages();
+	browser = await puppeteer.connect({
+		browserURL: "http://localhost:9222",
+		defaultViewport: null,
+		timeout: 5000,
+	});
+
+	const pages = await browser.pages();
 
 	switch (action) {
 		case "list":
 			console.log("Available tabs:");
 			for (let i = 0; i < pages.length; i++) {
 				const url = pages[i].url();
-				const title = await pages[i].title().catch(() => "(loading)");
 				const marker = i === pages.length - 1 ? "→" : " ";
-				console.log(`${marker} [${i}] ${title}`);
-				console.log(`    ${url}`);
+				console.log(marker + " [" + i + "] " + url);
 			}
 			break;
 
 		case "switch":
 			const index = parseInt(param);
 			if (isNaN(index) || index < 0 || index >= pages.length) {
-				console.error(`✗ Invalid tab index: ${param}. Valid range: 0-${pages.length - 1}`);
-				await b.disconnect();
+				console.error("✗ Invalid tab index: " + param + ". Valid range: 0-" + (pages.length - 1));
+				await safeDisconnect();
 				process.exit(1);
 			}
-			const targetPage = pages[index];
-			await targetPage.bringToFront();
-			const targetUrl = targetPage.url();
-			const targetTitle = await targetPage.title().catch(() => "(loading)");
-			console.log(`✓ Switched to tab [${index}]: ${targetTitle}`);
-			console.log(`  ${targetUrl}`);
+			await pages[index].bringToFront();
+			console.log("✓ Switched to tab [" + index + "]");
 			break;
 
 		case "switch-url":
 			if (!param) {
 				console.error("✗ URL parameter required for switch-url");
-				await b.disconnect();
+				await safeDisconnect();
 				process.exit(1);
 			}
 			let found = false;
@@ -68,48 +76,40 @@ try {
 				const url = pages[i].url();
 				if (url.includes(param)) {
 					await pages[i].bringToFront();
-					const title = await pages[i].title().catch(() => "(loading)");
-					console.log(`✓ Switched to tab [${i}] containing: ${param}`);
-					console.log(`  ${title}`);
+					console.log("✓ Switched to tab [" + i + "] containing: " + param);
 					found = true;
 					break;
 				}
 			}
 			if (!found) {
-				console.error(`✗ No tab found containing: ${param}`);
-				await b.disconnect();
+				console.error("✗ No tab found containing: " + param);
+				await safeDisconnect();
 				process.exit(1);
 			}
 			break;
 
 		case "new":
 			const newUrl = param || "about:blank";
-			const newPage = await b.newPage();
-			await newPage.goto(newUrl, { waitUntil: "domcontentloaded" });
-			const allPages = await b.pages();
-			const newIndex = allPages.length - 1;
-			const newTitle = await newPage.title().catch(() => "(loading)");
-			console.log(`✓ Opened new tab [${newIndex}]: ${newTitle}`);
-			console.log(`  ${newUrl}`);
+			const newPage = await browser.newPage();
+			await newPage.goto(newUrl, { waitUntil: "domcontentloaded", timeout: 10000 });
+			console.log("✓ Opened: " + newUrl);
 			break;
 
 		case "active":
 			const activePage = pages.at(-1);
-			const activeUrl = activePage.url();
-			const activeTitle = await activePage.title().catch(() => "(loading)");
-			const activeIndex = pages.length - 1;
-			console.log(`Active tab [${activeIndex}]: ${activeTitle}`);
-			console.log(`  ${activeUrl}`);
+			console.log("Active tab: " + activePage.url());
 			break;
 
 		default:
-			console.error(`✗ Unknown action: ${action}`);
+			console.error("✗ Unknown action: " + action);
 			console.error("Valid actions: list, switch, switch-url, new, active");
-			await b.disconnect();
+			await safeDisconnect();
 			process.exit(1);
 	}
 } catch (err) {
-	console.error(`✗ Error: ${err.message}`);
-	await b.disconnect();
+	console.error("✗ Error: " + err.message);
+	await safeDisconnect();
 	process.exit(1);
 }
+
+await safeDisconnect();
