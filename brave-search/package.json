@@ -1,8 +1,8 @@
 {
-  "name": "web-search",
+  "name": "brave-search",
   "version": "1.0.0",
   "type": "module",
-  "description": "Web search and content extraction - lightweight alternative to search MCP",
+  "description": "Web search and content extraction via Brave Search API",
   "author": "Jasion-han",
   "license": "MIT",
   "dependencies": {

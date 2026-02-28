@@ -1,9 +1,9 @@
 ---
-name: web-search
+name: brave-search
 description: Web search and content extraction via Brave Search API. Use for searching documentation, facts, or any web content. Lightweight, no browser required.
 ---
 
-# Web Search
+# Brave Search
 
 Web search and content extraction using the Brave Search API. No browser required.
 
@@ -20,20 +20,20 @@ Requires a Brave Search API account with a free subscription.
    ```
 5. Install dependencies (run once):
    ```bash
-   cd {baseDir}/web-search
+   cd {baseDir}/brave-search
    npm install
    ```
 
 ## Search
 
 ```bash
-{baseDir}/web-search/web-search.js "query"                         # Basic search (5 results)
-{baseDir}/web-search/web-search.js "query" -n 10                   # More results (max 20)
-{baseDir}/web-search/web-search.js "query" --content               # Include page content as markdown
-{baseDir}/web-search/web-search.js "query" --freshness pw          # Results from last week
-{baseDir}/web-search/web-search.js "query" --freshness 2024-01-01to2024-06-30  # Date range
-{baseDir}/web-search/web-search.js "query" --country DE            # Results from Germany
-{baseDir}/web-search/web-search.js "query" -n 3 --content          # Combined options
+{baseDir}/brave-search/search.js "query"                         # Basic search (5 results)
+{baseDir}/brave-search/search.js "query" -n 10                   # More results (max 20)
+{baseDir}/brave-search/search.js "query" --content               # Include page content as markdown
+{baseDir}/brave-search/search.js "query" --freshness pw          # Results from last week
+{baseDir}/brave-search/search.js "query" --freshness 2024-01-01to2024-06-30  # Date range
+{baseDir}/brave-search/search.js "query" --country DE            # Results from Germany
+{baseDir}/brave-search/search.js "query" -n 3 --content          # Combined options
 ```
 
 ### Options
@@ -51,7 +51,7 @@ Requires a Brave Search API account with a free subscription.
 ## Extract Page Content
 
 ```bash
-{baseDir}/web-search/web-content.js https://example.com/article
+{baseDir}/brave-search/content.js https://example.com/article
 ```
 
 Fetches a URL and extracts readable content as markdown.

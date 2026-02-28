@@ -14,7 +14,7 @@ Lightweight alternatives to MCP servers. Use Bash scripts and code instead of he
 | Skill | Description |
 |-------|-------------|
 | [browser-tools](browser-tools/SKILL.md) | Browser automation via Chrome DevTools Protocol - lightweight alternative to Playwright/Chrome DevTools MCP |
-| [web-search](web-search/SKILL.md) | Web search and content extraction - lightweight alternative to search MCP |
+| [brave-search](brave-search/SKILL.md) | Web search and content extraction via Brave Search API - lightweight alternative to search MCP |
 
 ## Installation
 
@@ -39,7 +39,7 @@ ln -s ~/native-agent-skills/browser-tools .claude/skills/browser-tools
 /add-dir ~/native-agent-skills
 ```
 
-Then use `@browser-tools/SKILL.md` or `@web-search/SKILL.md` to reference the skill documentation.
+Then use `@browser-tools/SKILL.md` or `@brave-search/SKILL.md` to reference the skill documentation.
 
 ### Codex CLI
 
@@ -59,7 +59,7 @@ See [browser-tools](browser-tools/) as an example.
 ## Requirements
 
 - **browser-tools**: Requires Chrome and Node.js. Run `npm install` in the skill directory.
-- **web-search**: Requires Brave Search API key. See [web-search/SKILL.md](web-search/SKILL.md) for setup instructions.
+- **brave-search**: Requires Brave Search API key. See [brave-search/SKILL.md](brave-search/SKILL.md) for setup instructions.
 
 ## License
 
