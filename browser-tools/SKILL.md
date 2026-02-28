@@ -81,6 +81,104 @@ Display all cookies for the current tab including domain, path, httpOnly, and se
 
 Navigate to a URL and extract readable content as markdown. Uses Mozilla Readability for article extraction and Turndown for HTML-to-markdown conversion. Works on pages with JavaScript content (waits for page to load).
 
+## Click Element
+
+```
+{baseDir}/browser-tools/browser-click.js '#submit-button'
+{baseDir}/browser-tools/browser-click.js 'button:nth-child(2)' --double
+{baseDir}/browser-click.js '.menu-item' --right
+```
+
+Click an element by CSS selector. Supports single click, double click, and right click.
+
+Options:
+- `--double` - Double click instead of single click
+- `--right` - Right click (context menu)
+
+## Type Text
+
+```
+{baseDir}/browser-tools/browser-type.js '#search-input' 'hello world'
+{baseDir}/browser-tools/browser-type.js '#search-input' 'new text' --clear
+{baseDir}/browser-tools/browser-type.js '#search-input' 'appended' --append
+{baseDir}/browser-tools/browser-type.js '#search-input' 'slow' --typing
+```
+
+Type text into an input element.
+
+Options:
+- `--clear` - Clear input before typing
+- `--append` - Append to existing text
+- `--typing` - Simulate real typing (character by character)
+
+## Scroll
+
+```
+{baseDir}/browser-tools/browser-scroll.js down
+{baseDir}/browser-tools/browser-scroll.js down 1000
+{baseDir}/browser-tools/browser-scroll.js up 500
+{baseDir}/browser-tools/browser-scroll.js top
+{baseDir}/browser-tools/browser-scroll.js bottom
+{baseDir}/browser-tools/browser-scroll.js element '#footer'
+```
+
+Scroll the page.
+
+Arguments:
+- `up/down` - Scroll direction (default: 500px)
+- `top/bottom` - Scroll to page top/bottom
+- `element` - Scroll to specific element
+
+Options:
+- `--smooth` - Use smooth scrolling animation
+
+## Wait for Element
+
+```
+{baseDir}/browser-tools/browser-wait.js wait-for '#loading-spinner' --visible
+{baseDir}/browser-tools/browser-wait.js wait-gone '.loading'
+{baseDir}/browser-tools/browser-wait.js wait-for '.modal' --timeout=5000
+```
+
+Wait for an element to appear or disappear.
+
+Arguments:
+- `wait-for` - Wait for element to exist
+- `wait-gone` - Wait for element to be removed
+
+Options:
+- `--visible` - Wait for element to be visible
+- `--hidden` - Wait for element to be hidden/removed
+- `--timeout=N` - Timeout in milliseconds (default: 10000)
+
+## Tab Management
+
+```
+{baseDir}/browser-tools/browser-tabs.js list
+{baseDir}/browser-tools/browser-tabs.js switch 2
+{baseDir}/browser-tools/browser-tabs.js switch-url 'github.com'
+{baseDir}/browser-tools/browser-tabs.js new https://google.com
+{baseDir}/browser-tools/browser-tabs.js active
+```
+
+Manage browser tabs.
+
+Actions:
+- `list` - List all open tabs
+- `switch <index>` - Switch to tab by index (0-based)
+- `switch-url <url>` - Switch to tab containing URL
+- `new <url>` - Open new tab with URL
+- `active` - Show current active tab
+
+## Close Tab
+
+```
+{baseDir}/browser-tools/browser-close.js
+{baseDir}/browser-tools/browser-close.js 2
+```
+
+Close the current tab or a specific tab by index. Cannot close the last tab.
+
 ## When to Use
 
 - Testing frontend code in a real browser
