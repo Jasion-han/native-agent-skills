@@ -1,0 +1,11 @@
+{
+  "name": "agent-skills",
+  "version": "1.0.0",
+  "description": "Custom agent skills for AI coding assistants",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": ["agent", "skills", "ai", "claude"],
+  "author": "Jasion-han",
+  "license": "MIT"
+}

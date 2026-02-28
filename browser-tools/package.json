@@ -1,0 +1,17 @@
+{
+  "name": "browser-tools",
+  "version": "1.0.0",
+  "description": "Browser automation tools for agent-assisted web interaction",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": ["browser", "automation", "puppeteer", " CDP"],
+  "author": "Jasion-han",
+  "license": "MIT",
+  "dependencies": {
+    "puppeteer-core": "^21.0.0",
+    "@mozilla/readability": "^3.0.0",
+    "turndown": "^7.1.0"
+  }
+}
