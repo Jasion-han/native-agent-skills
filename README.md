@@ -1,36 +1,41 @@
-# Agent Skills
+# Native Agent Skills
 
-Custom skills for AI coding agents (compatible with Claude Code, OpenCode, Codex CLI, and similar tools).
+Lightweight alternatives to MCP servers. Use Bash scripts and code instead of heavy MCP tools to save tokens and gain more flexibility.
+
+## Why Native Skills?
+
+- **Token Efficient**: Only ~225 tokens vs 13000+ for MCP servers
+- **Highly Customizable**: Modify scripts as needed without understanding complex MCP codebases
+- **Composable**: Chain commands, save outputs to files, and combine with other tools
+- **No Overhead**: Direct execution without MCP protocol overhead
 
 ## Available Skills
 
 | Skill | Description |
 |-------|-------------|
-| [browser-tools](browser-tools/SKILL.md) | Interactive browser automation via Chrome DevTools Protocol |
+| [browser-tools](browser-tools/SKILL.md) | Browser automation via Chrome DevTools Protocol - lightweight alternative to Playwright/Chrome DevTools MCP |
 
 ## Installation
 
 ### Claude Code
 
-Claude Code only looks one level deep for `SKILL.md` files, so each skill folder must be directly under the skills directory. Clone the repo somewhere, then symlink individual skills:
-
 ```
 # Clone to a convenient location
-git clone https://github.com/Jasion-han/agent-skills ~/agent-skills
+git clone https://github.com/Jasion-han/native-agent-skills ~/native-agent-skills
 
 # Symlink individual skills (user-level)
 mkdir -p ~/.claude/skills
-ln -s ~/agent-skills/browser-tools ~/.claude/skills/browser-tools
+ln -s ~/native-agent-skills/browser-tools ~/.claude/skills/browser-tools
 
 # Or project-level
 mkdir -p .claude/skills
-ln -s ~/agent-skills/browser-tools .claude/skills/browser-tools
+ln -s ~/native-agent-skills/browser-tools .claude/skills/browser-tools
 ```
 
 ### OpenCode
 
 ```
-/add-dir ~/agent-skills
+/add-dir ~/native-agent-skills
 ```
 
 Then use `@browser-tools/SKILL.md` to reference the skill documentation.
@@ -38,26 +43,17 @@ Then use `@browser-tools/SKILL.md` to reference the skill documentation.
 ### Codex CLI
 
 ```
-git clone https://github.com/Jasion-han/agent-skills ~/.codex/skills/agent-skills
+git clone https://github.com/Jasion-han/native-agent-skills ~/.codex/skills/native-agent-skills
 ```
 
-## Skill Format
+## Adding New Skills
 
-Each skill follows the standard format:
+Each skill is a folder containing:
+- `SKILL.md` - Skill definition and documentation
+- `*.js` - Executable scripts
+- `package.json` - Dependencies (if needed)
 
-```
----
-name: skill-name
-description: Short description shown to agent
----
-
-# Instructions
-
-Detailed instructions here...
-Helper files available at: {baseDir}/
-```
-
-The `{baseDir}` placeholder is replaced with the skill's directory path at runtime.
+See [browser-tools](browser-tools/) as an example.
 
 ## Requirements
 
