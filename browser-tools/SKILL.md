@@ -295,3 +295,36 @@ Always start by understanding the page structure:
 ```
 
 Then target specific elements based on what you find.
+
+* * *
+
+## Important Notes
+
+### Prerequisites
+
+1. **Chrome Must Be Running**: Before using any tool, Chrome must be running with remote debugging enabled on port 9222. Use `browser-start.js` to start Chrome, or manually start Chrome with:
+   ```
+   chrome --remote-debugging-port=9222
+   ```
+
+2. **Install Dependencies**: Run `npm install` in the browser-tools directory before first use.
+
+3. **Platform Limitation**: `browser-start.js` currently only works on macOS. For Windows/Linux, manually start Chrome with the debugging flag.
+
+### Common Issues
+
+| Issue | Solution |
+|-------|----------|
+| "No active tab found" | Make sure Chrome is running with `--remote-debugging-port=9222` |
+| "Element not found" | Use `browser-pick.js` to interactively select the element |
+| "Failed to click" | Element may be hidden or not interactable. Try scrolling to it first |
+| "Timeout waiting for element" | Increase timeout with `--timeout=N` option |
+| "Cannot close last tab" | Chrome requires at least one tab open |
+
+### Best Practices
+
+1. **Always check page state first** - Use `browser-eval.js` to inspect the page before interacting
+2. **Use selectors wisely** - Prefer ID (#id) or unique classes over complex selectors
+3. **Handle errors gracefully** - Check console output for error messages
+4. **Keep Chrome running** - Don't call `browser-start.js` before every operation
+5. **Wait when needed** - Use `browser-wait.js` after actions that trigger DOM changes
