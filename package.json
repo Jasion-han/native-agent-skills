@@ -1,11 +1,11 @@
 {
-  "name": "agent-skills",
+  "name": "native-agent-skills",
   "version": "1.0.0",
-  "description": "Custom agent skills for AI coding assistants",
+  "description": "Lightweight alternatives to MCP servers for AI coding agents",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": ["agent", "skills", "ai", "claude"],
+  "keywords": ["agent", "skills", "ai", "claude", "mcp", "browser", "search"],
   "author": "Jasion-han",
   "license": "MIT"
 }

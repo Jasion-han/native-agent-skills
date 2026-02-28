@@ -27,10 +27,12 @@ git clone https://github.com/Jasion-han/native-agent-skills ~/native-agent-skill
 # Symlink individual skills (user-level)
 mkdir -p ~/.claude/skills
 ln -s ~/native-agent-skills/browser-tools ~/.claude/skills/browser-tools
+ln -s ~/native-agent-skills/brave-search ~/.claude/skills/brave-search
 
 # Or project-level
 mkdir -p .claude/skills
 ln -s ~/native-agent-skills/browser-tools .claude/skills/browser-tools
+ln -s ~/native-agent-skills/brave-search .claude/skills/brave-search
 ```
 
 ### OpenCode

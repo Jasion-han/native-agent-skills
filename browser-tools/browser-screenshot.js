@@ -4,6 +4,9 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import puppeteer from "puppeteer-core";
 
+const args = process.argv.slice(2);
+const fullPage = args.includes("--full");
+
 const b = await puppeteer.connect({
 	browserURL: "http://localhost:9222",
 	defaultViewport: null,
@@ -23,7 +26,7 @@ try {
 	const filename = `screenshot-${timestamp}.png`;
 	const filepath = join(tmpdir(), filename);
 
-	await p.screenshot({ path: filepath });
+	await p.screenshot({ path: filepath, fullPage });
 
 	console.log(filepath);
 } catch (err) {
