@@ -5,107 +5,80 @@ import puppeteer from "puppeteer-core";
 const args = process.argv.slice(2);
 
 if (args.length === 0) {
-	console.log("Usage: browser-scroll.js <direction> [amount] [options]");
+	console.log("Usage: browser-scroll.js <direction> [amount]");
 	console.log("\nArguments:");
-	console.log("  <direction>  Scroll direction: up, down, top, bottom, or element");
-	console.log("  [amount]    Pixels to scroll (default: 500 for up/down)");
-	console.log("\nOptions:");
-	console.log("  --smooth    Use smooth scrolling animation");
+	console.log("  <direction>  up, down, top, bottom, or element");
+	console.log("  [amount]    Pixels (default: 500)");
 	console.log("\nExamples:");
 	console.log("  browser-scroll.js down");
 	console.log("  browser-scroll.js down 1000");
-	console.log("  browser-scroll.js up 500");
 	console.log("  browser-scroll.js top");
 	console.log("  browser-scroll.js bottom");
-	console.log("  browser-scroll.js element '#footer'");
 	process.exit(1);
 }
 
 const direction = args[0];
 const amount = parseInt(args[1]) || 500;
-const useSmooth = args.includes("--smooth");
 
-const b = await puppeteer.connect({
-	browserURL: "http://localhost:9222",
-	defaultViewport: null,
-});
+let browser;
+let disconnected = false;
 
-const pages = await b.pages();
-const p = pages.at(-1);
-
-if (!p) {
-	console.error("✗ No active tab found");
-	await b.disconnect();
-	process.exit(1);
+async function safeDisconnect() {
+	if (browser && !disconnected) {
+		disconnected = true;
+		await browser.disconnect();
+	}
 }
 
-const scrollBehavior = useSmooth ? "smooth" : "auto";
-
-let result;
+process.on("SIGINT", safeDisconnect);
+process.on("SIGTERM", safeDisconnect);
 
 try {
+	browser = await puppeteer.connect({
+		browserURL: "http://localhost:9222",
+		defaultViewport: null,
+		timeout: 5000,
+	});
+
+	const pages = await browser.pages();
+	const p = pages.at(-1);
+
+	if (!p) {
+		console.error("✗ No active tab found");
+		await safeDisconnect();
+		process.exit(1);
+	}
+
 	switch (direction) {
 		case "up":
-			result = await p.evaluate((px, behavior) => {
-				window.scrollBy({ top: -px, behavior });
-				return { direction: "up", pixels: px };
-			}, amount, scrollBehavior);
-			console.log(`✓ Scrolled up ${amount}px`);
+			await p.evaluate((px) => window.scrollBy({ top: -px, behavior: "instant" }), amount);
+			console.log("✓ Scrolled up " + amount + "px");
 			break;
 
 		case "down":
-			result = await p.evaluate((px, behavior) => {
-				window.scrollBy({ top: px, behavior });
-				return { direction: "down", pixels: px };
-			}, amount, scrollBehavior);
-			console.log(`✓ Scrolled down ${amount}px`);
+			await p.evaluate((px) => window.scrollBy({ top: px, behavior: "instant" }), amount);
+			console.log("✓ Scrolled down " + amount + "px");
 			break;
 
 		case "top":
-			result = await p.evaluate((behavior) => {
-				window.scrollTo({ top: 0, behavior });
-				return { direction: "top" };
-			}, scrollBehavior);
+			await p.evaluate(() => window.scrollTo({ top: 0, behavior: "instant" }));
 			console.log("✓ Scrolled to top");
 			break;
 
 		case "bottom":
-			result = await p.evaluate((behavior) => {
-				window.scrollTo({ top: document.body.scrollHeight, behavior });
-				return { direction: "bottom" };
-			}, scrollBehavior);
+			await p.evaluate(() => window.scrollTo({ top: document.body.scrollHeight, behavior: "instant" }));
 			console.log("✓ Scrolled to bottom");
 			break;
 
-		case "element":
-			const selector = args[1];
-			if (!selector) {
-				console.error("✗ Element selector required for 'element' direction");
-				await b.disconnect();
-				process.exit(1);
-			}
-			result = await p.evaluate((sel, behavior) => {
-				const el = document.querySelector(sel);
-				if (!el) return { error: `Element not found: ${sel}` };
-				el.scrollIntoView({ behavior });
-				return { direction: "element", selector: sel };
-			}, selector, scrollBehavior);
-			if (result.error) {
-				console.error(`✗ ${result.error}`);
-				await b.disconnect();
-				process.exit(1);
-			}
-			console.log(`✓ Scrolled to element: ${selector}`);
-			break;
-
 		default:
-			console.error(`✗ Unknown direction: ${direction}`);
-			console.error("Valid directions: up, down, top, bottom, element");
-			await b.disconnect();
+			console.error("✗ Unknown direction: " + direction);
+			await safeDisconnect();
 			process.exit(1);
 	}
 } catch (err) {
-	console.error(`✗ Scroll failed: ${err.message}`);
-	await b.disconnect();
+	console.error("✗ Error: " + err.message);
+	await safeDisconnect();
 	process.exit(1);
 }
+
+await safeDisconnect();

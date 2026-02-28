@@ -1,8 +1,6 @@
 #!/usr/bin/env node
 
 import puppeteer from "puppeteer-core";
-import { Readability } from "@mozilla/readability";
-import { TurndownService } from "turndown";
 
 const url = process.argv[2];
 
@@ -13,30 +11,40 @@ if (!url) {
 	process.exit(1);
 }
 
-const b = await puppeteer.connect({
-	browserURL: "http://localhost:9222",
-	defaultViewport: null,
-});
+let browser;
+let disconnected = false;
+
+async function safeDisconnect() {
+	if (browser && !disconnected) {
+		disconnected = true;
+		await browser.disconnect();
+	}
+}
+
+process.on("SIGINT", safeDisconnect);
+process.on("SIGTERM", safeDisconnect);
 
 try {
-	const p = await b.newPage();
+	browser = await puppeteer.connect({
+		browserURL: "http://localhost:9222",
+		defaultViewport: null,
+		timeout: 5000,
+	});
+
+	const p = await browser.newPage();
 	await p.goto(url, { waitUntil: "networkidle2", timeout: 30000 });
 
 	const content = await p.evaluate(() => {
-		const article = new Readability(document).parse();
-		return article ? article.content : document.body.innerHTML;
+		return document.body.innerText.substring(0, 5000);
 	});
 
-	const turndown = new TurndownService();
-	const markdown = turndown.turndown(content);
-
-	console.log(markdown);
+	console.log(content);
 
 	await p.close();
 } catch (err) {
-	console.error(`✗ Failed to extract content: ${err.message}`);
-	await b.disconnect();
+	console.error("✗ Failed: " + err.message);
+	await safeDisconnect();
 	process.exit(1);
 }
 
-await b.disconnect();
+await safeDisconnect();
