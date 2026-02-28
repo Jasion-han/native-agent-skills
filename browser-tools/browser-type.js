@@ -52,29 +52,24 @@ if (!element) {
 	process.exit(1);
 }
 
-try {
-	await element.scrollIntoViewIfNeeded();
-	await element.focus();
+	try {
+		await element.scrollIntoViewIfNeeded();
+		await element.focus();
 
-	if (shouldClear && !shouldAppend) {
-		await element.evaluate(el => {
-			el.value = "";
-			el.dispatchEvent(new Event("input", { bubbles: true }));
-			el.dispatchEvent(new Event("change", { bubbles: true }));
-		});
-	}
+		if (useTyping) {
+			await element.type(text, { delay: 50 });
+		} else {
+			await element.evaluate((el, value, shouldClear, shouldAppend) => {
+				if (shouldClear || (!shouldAppend && el.value !== "")) {
+					el.value = "";
+				}
+				el.value = el.value + value;
+				el.dispatchEvent(new Event("input", { bubbles: true }));
+				el.dispatchEvent(new Event("change", { bubbles: true }));
+			}, text, shouldClear, shouldAppend);
+		}
 
-	if (useTyping) {
-		await element.type(text, { delay: 50 });
-	} else {
-		await element.evaluate((el, value) => {
-			el.value = el.value + value;
-			el.dispatchEvent(new Event("input", { bubbles: true }));
-			el.dispatchEvent(new Event("change", { bubbles: true }));
-		}, shouldAppend ? "" : text);
-	}
-
-	console.log(`✓ Typed: "${text}" into ${selector}`);
+		console.log(`✓ Typed: "${text}" into ${selector}`);
 } catch (err) {
 	console.error(`✗ Failed to type: ${err.message}`);
 	await b.disconnect();

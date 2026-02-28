@@ -25,6 +25,8 @@ npm install
 
 Launch Chrome with remote debugging on `:9222`. Use `--profile` to preserve user's authentication state.
 
+> **Note**: Currently only works on macOS. For other platforms, manually start Chrome with `--remote-debugging-port=9222`.
+
 ## Navigate
 
 ```

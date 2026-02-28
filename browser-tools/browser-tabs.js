@@ -86,7 +86,8 @@ try {
 			const newUrl = param || "about:blank";
 			const newPage = await b.newPage();
 			await newPage.goto(newUrl, { waitUntil: "domcontentloaded" });
-			const newIndex = pages.length;
+			const allPages = await b.pages();
+			const newIndex = allPages.length - 1;
 			const newTitle = await newPage.title().catch(() => "(loading)");
 			console.log(`✓ Opened new tab [${newIndex}]: ${newTitle}`);
 			console.log(`  ${newUrl}`);

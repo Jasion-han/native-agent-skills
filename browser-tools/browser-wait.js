@@ -44,9 +44,6 @@ if (!p) {
 }
 
 try {
-	let found = false;
-	let visible = false;
-
 	if (mode === "wait-for") {
 		await p.waitForSelector(selector, { 
 			visible: waitForVisible,
