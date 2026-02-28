@@ -18,18 +18,25 @@ const b = await puppeteer.connect({
 	defaultViewport: null,
 });
 
-const p = await b.newPage();
-await p.goto(url, { waitUntil: "domcontentloaded" });
+try {
+	const p = await b.newPage();
+	await p.goto(url, { waitUntil: "networkidle2", timeout: 30000 });
 
-const content = await p.evaluate(() => {
-	const article = new Readability(document).parse();
-	return article ? article.content : document.body.innerHTML;
-});
+	const content = await p.evaluate(() => {
+		const article = new Readability(document).parse();
+		return article ? article.content : document.body.innerHTML;
+	});
 
-const turndown = new TurndownService();
-const markdown = turndown.turndown(content);
+	const turndown = new TurndownService();
+	const markdown = turndown.turndown(content);
 
-console.log(markdown);
+	console.log(markdown);
 
-await p.close();
+	await p.close();
+} catch (err) {
+	console.error(`✗ Failed to extract content: ${err.message}`);
+	await b.disconnect();
+	process.exit(1);
+}
+
 await b.disconnect();

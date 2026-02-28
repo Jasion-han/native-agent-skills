@@ -45,5 +45,3 @@ try {
 	await b.disconnect();
 	process.exit(1);
 }
-
-await b.disconnect();

@@ -18,14 +18,28 @@ const b = await puppeteer.connect({
 	defaultViewport: null,
 });
 
-if (newTab) {
-	const p = await b.newPage();
-	await p.goto(url, { waitUntil: "domcontentloaded" });
-	console.log("✓ Opened:", url);
-} else {
-	const p = (await b.pages()).at(-1);
-	await p.goto(url, { waitUntil: "domcontentloaded" });
-	console.log("✓ Navigated to:", url);
+const pages = await b.pages();
+const p = pages.at(-1);
+
+if (!p) {
+	console.error("✗ No active tab found");
+	await b.disconnect();
+	process.exit(1);
+}
+
+try {
+	if (newTab) {
+		const newPage = await b.newPage();
+		await newPage.goto(url, { waitUntil: "domcontentloaded" });
+		console.log("✓ Opened:", url);
+	} else {
+		await p.goto(url, { waitUntil: "domcontentloaded" });
+		console.log("✓ Navigated to:", url);
+	}
+} catch (err) {
+	console.error(`✗ Navigation failed: ${err.message}`);
+	await b.disconnect();
+	process.exit(1);
 }
 
 await b.disconnect();

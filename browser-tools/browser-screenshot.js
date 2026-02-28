@@ -9,19 +9,27 @@ const b = await puppeteer.connect({
 	defaultViewport: null,
 });
 
-const p = (await b.pages()).at(-1);
+const pages = await b.pages();
+const p = pages.at(-1);
 
 if (!p) {
 	console.error("✗ No active tab found");
+	await b.disconnect();
 	process.exit(1);
 }
 
-const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
-const filename = `screenshot-${timestamp}.png`;
-const filepath = join(tmpdir(), filename);
+try {
+	const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
+	const filename = `screenshot-${timestamp}.png`;
+	const filepath = join(tmpdir(), filename);
 
-await p.screenshot({ path: filepath });
+	await p.screenshot({ path: filepath });
 
-console.log(filepath);
+	console.log(filepath);
+} catch (err) {
+	console.error(`✗ Screenshot failed: ${err.message}`);
+	await b.disconnect();
+	process.exit(1);
+}
 
 await b.disconnect();
